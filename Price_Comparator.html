@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Product Search and Price Comparison</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      color: #333;
+    }
+
+    h1 {
+      color: #3498db;
+    }
+
+    input, select {
+      margin: 10px;
+      padding: 8px;
+      width: 200px;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    #results {
+      margin: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .product {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 80%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: left;
+    }
+
+    .product a {
+      text-decoration: none;
+      color: #3498db;
+      font-weight: bold;
+    }
+
+    .product img {
+      max-width: 100%;
+      height: auto;
+      margin-top: 10px;
+      border-radius: 4px;
+    }
+
+    .product p {
+      margin-top: 10px;
+    }
+
+    .cheapest {
+      font-weight: bold;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1>Advanced Product Search and Price Comparison</h1>
+  <label for="product">Product:</label>
+  <input type="text" id="product" placeholder="Enter a product">
+  <label for="category">Country:</label>
+  <select id="category">
+    <option value="all">All</option>
+    <option value="fr">France</option>
+    <option value="it">Italy</option>
+    <option value="es">Spain</option>
+    <option value="com">United States</option>
+    <option value="mx">Mexico</option>
+    <option value="uk">United Kingdom</option>
+    <option value="de">Germany</option>
+    <option value="au">Australia</option>
+    <option value="jp">Japan</option>
+    <!-- Add more countries as needed -->
+  </select>
+  <label for="currency">Currency:</label>
+  <select id="currency">
+    <option value="usd">USD</option>
+    <option value="eur">EUR</option>
+    <option value="aud">AUD</option>
+    <option value="mxn">MXN</option>
+    <option value="jpy">JPY</option>
+    <!-- Add more currencies as needed -->
+  </select>
+  <label for="minPrice">Minimum Price:</label>
+  <input type="number" id="minPrice" placeholder="Enter minimum price">
+  <label for="maxPrice">Maximum Price:</label>
+  <input type="number" id="maxPrice" placeholder="Enter maximum price">
+  <button onclick="searchAndCompare()">Search & Compare</button>
+  <div id="results"></div>
+
+  <script>
+    function searchAndCompare() {
+      const product = document.getElementById("product").value;
+      const country = document.getElementById("category").value;
+      const currency = document.getElementById("currency").value;
+      const minPrice = document.getElementById("minPrice").value;
+      const maxPrice = document.getElementById("maxPrice").value;
+
+      if (!product.trim()) {
+        alert("Please enter a product.");
+        return;
+      }
+
+      // Simulated API calls, replace these with actual server-side calls
+      const amazonFrLink = simulateSearchAmazon(product, 'fr');
+      const amazonItLink = simulateSearchAmazon(product, 'it');
+      const amazonEsLink = simulateSearchAmazon(product, 'es');
+      const amazonComLink = simulateSearchAmazon(product, 'com');
+      const amazonMxLink = simulateSearchAmazon(product, 'mx');
+      const amazonUkLink = simulateSearchAmazon(product, 'uk');
+      const amazonDeLink = simulateSearchAmazon(product, 'de');
+      const amazonAuLink = simulateSearchAmazon(product, 'au');
+      const amazonJpLink = simulateSearchAmazon(product, 'co.jp');
+
+      const rakutenLink = simulateSearchRakuten(product);
+      const ebayLink = simulateSearchEbay(product);
+      const cdiscountLink = simulateSearchCdiscount(product);
+      const fnacLink = simulateSearchFnac(product);
+
+      const prices = {
+        AmazonFR: { link: amazonFrLink, price: simulatePrice() },
+        AmazonIT: { link: amazonItLink, price: simulatePrice() },
+        AmazonES: { link: amazonEsLink, price: simulatePrice() },
+        AmazonUS: { link: amazonComLink, price: simulatePrice() },
+        AmazonMX: { link: amazonMxLink, price: simulatePrice() },
+        AmazonUK: { link: amazonUkLink, price: simulatePrice() },
+        AmazonDE: { link: amazonDeLink, price: simulatePrice() },
+        AmazonAU: { link: amazonAuLink, price: simulatePrice() },
+        AmazonJP: { link: amazonJpLink, price: simulatePrice() },
+        Rakuten: { link: rakutenLink, price: simulatePrice() },
+        eBay: { link: ebayLink, price: simulatePrice() },
+        Cdiscount: { link: cdiscountLink, price: simulatePrice() },
+        Fnac: { link: fnacLink, price: simulatePrice() },
+      };
+
+      // Sort prices by price in ascending order
+      const sortedPrices = Object.entries(prices).sort(([, a], [, b]) => a.price - b.price);
+
+      // Display results
+      displayResults(sortedPrices, currency);
+    }
+
+    function simulateSearchAmazon(product, country) {
+      return `https://www.amazon.${country}/s?k=${encodeURIComponent(product)}&crid=2QQTHQRJI5OQH&sprefix=${encodeURIComponent(product)}%2Caps%2C86&ref=nb_sb_noss_1`;
+    }
+
+    function simulateSearchRakuten(product) {
+      return `https://fr.shopping.rakuten.com/search/${encodeURIComponent(product)}`;
+    }
+
+    function simulateSearchEbay(product) {
+      return `https://www.ebay.fr/sch/i.html?_from=R40&_trksid=p4432023.m570.l1313&_nkw=${encodeURIComponent(product)}&_sacat=0`;
+    }
+
+    function simulateSearchCdiscount(product) {
+      return `https://www.cdiscount.com/search/10/${encodeURIComponent(product)}.html#_his_`;
+    }
+
+    function simulateSearchFnac(product) {
+      return `https://www.fnac.com/SearchResult/ResultList.aspx?Search=${encodeURIComponent(product)}&sft=1&sa=0`;
+    }
+
+    function simulateCurrencyConversion(price, fromCurrency, toCurrency) {
+      // Simulated currency conversion, replace with actual logic or API call
+      const conversionRates = {
+        usd: 1,  // 1 USD to USD
+        eur: 0.85, // Replace with actual conversion rates
+        aud: 1.37,
+        mxn: 20.32,
+        jpy: 109.47,
+      };
+
+      const convertedPrice = price * conversionRates[toCurrency] / conversionRates[fromCurrency];
+      return convertedPrice.toFixed(2);
+    }
+
+    function simulatePrice() {
+      // Simulated price, replace this with an actual call to get the real price
+      return (Math.random() * (500 - 10) + 10).toFixed(2);
+    }
+
+    function displayResults(sortedPrices, currency) {
+      const resultsContainer = document.getElementById("results");
+      resultsContainer.innerHTML = "";
+
+      sortedPrices.forEach(([store, productInfo], index) => {
+        const productDiv = document.createElement("div");
+        productDiv.classList.add("product");
+
+        const storeHeader = document.createElement("h3");
+        storeHeader.textContent = store;
+
+        const linkAnchor = document.createElement("a");
+        linkAnchor.href = productInfo.link;
+        linkAnchor.textContent = "View Product";
+
+        const priceParagraph = document.createElement("p");
+        const convertedPrice = simulateCurrencyConversion(productInfo.price, 'usd', currency);
+        priceParagraph.innerHTML = `Price: $${productInfo.price} (${convertedPrice} ${currency})`;
+
+        if (index === 0) {
+          priceParagraph.classList.add("cheapest");
+        }
+
+        productDiv.appendChild(storeHeader);
+        productDiv.appendChild(linkAnchor);
+        productDiv.appendChild(priceParagraph);
+
+        resultsContainer.appendChild(productDiv);
+      });
+    }
+  </script>
+</body>
+</html>
